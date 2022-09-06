@@ -1,7 +1,11 @@
 package com.viva903.springsecurity.demo.config;
 
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -13,15 +17,25 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @EnableWebSecurity
 public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Bean
-	public InMemoryUserDetailsManager userDetailsService() {
-		UserDetails john = User.withDefaultPasswordEncoder().username("john")
-				.password("password").roles("EMPLOYEE").build();
-		UserDetails mary = User.withDefaultPasswordEncoder().username("mary")
-				.password("password").roles("EMPLOYEE", "MANAGER").build();
-		UserDetails susan = User.withDefaultPasswordEncoder().username("susan")
-				.password("password").roles("EMPLOYEE", "ADMIN").build();
-		return new InMemoryUserDetailsManager(john, mary, susan);
+//	add reference to our security data source
+	@Autowired
+	private DataSource securityDataSource;
+	
+//	@Bean
+//	public InMemoryUserDetailsManager userDetailsService() {
+//		UserDetails john = User.withDefaultPasswordEncoder().username("john")
+//				.password("password").roles("EMPLOYEE").build();
+//		UserDetails mary = User.withDefaultPasswordEncoder().username("mary")
+//				.password("password").roles("EMPLOYEE", "MANAGER").build();
+//		UserDetails susan = User.withDefaultPasswordEncoder().username("susan")
+//				.password("password").roles("EMPLOYEE", "ADMIN").build();
+//		return new InMemoryUserDetailsManager(john, mary, susan);
+//	}
+	
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//		use JDBC authentication 
+		auth.jdbcAuthentication().dataSource(securityDataSource);
 	}
 
 	@Override

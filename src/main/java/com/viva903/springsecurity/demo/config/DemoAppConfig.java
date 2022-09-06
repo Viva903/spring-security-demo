@@ -48,6 +48,7 @@ public class DemoAppConfig implements WebMvcConfigurer {
 	}
 
 //	define a bean for our security datasource
+	@Bean
 	public DataSource securityDataSource() {
 
 //		create connection pool
@@ -55,6 +56,8 @@ public class DemoAppConfig implements WebMvcConfigurer {
 
 //		set jdbc driver class
 		try {
+			logger.info("**********************************************************");
+			logger.info(">>> jdbc.driver=" + env.getProperty("jdbc.driver"));
 			securityDataSource.setDriverClass(env.getProperty("jdbc.driver"));
 		} catch (PropertyVetoException exc) {
 			throw new RuntimeException(exc);
