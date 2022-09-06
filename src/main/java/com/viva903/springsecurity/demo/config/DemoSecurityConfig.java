@@ -18,20 +18,26 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 		UserDetails john = User.withDefaultPasswordEncoder().username("john")
 				.password("password").roles("EMPLOYEE").build();
 		UserDetails mary = User.withDefaultPasswordEncoder().username("mary")
-				.password("password").roles("MANAGER").build();
+				.password("password").roles("EMPLOYEE", "MANAGER").build();
 		UserDetails susan = User.withDefaultPasswordEncoder().username("susan")
-				.password("password").roles("ADMIN").build();
+				.password("password").roles("EMPLOYEE", "ADMIN").build();
 		return new InMemoryUserDetailsManager(john, mary, susan);
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/css/**").permitAll()
-				.anyRequest().authenticated()
-				.and()
-				.formLogin()
-				.loginPage("/showMyLoginPage")
-				.loginProcessingUrl("/authenticateTheUser").permitAll();
+		http.authorizeRequests()
+			.antMatchers("/css/**").permitAll()
+			.antMatchers("/").hasRole("EMPLOYEE")
+			.antMatchers("/leaders/**").hasRole("MANAGER")
+			.antMatchers("/systems/**").hasRole("ADMIN")
+			.anyRequest().authenticated()
+			.and()
+			.formLogin().loginPage("/showMyLoginPage").loginProcessingUrl("/authenticateTheUser").permitAll()
+			.and()
+			.logout().permitAll()
+			.and()
+			.exceptionHandling().accessDeniedPage("/accessDenied");
 	}
 
 }
